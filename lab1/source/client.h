@@ -1,6 +1,6 @@
 #ifndef CLIENT_H
 #define CLIENT_H
-#define MAXLINE 1024
+#define MAXLINE 512
 
 int openClientFd(char *, int);
 
