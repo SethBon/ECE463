@@ -7,6 +7,10 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#define MAXLINE 512
+
+int openClientFd(char *, int);
+
 
 int main(int argc, char ** argv) {
 	
