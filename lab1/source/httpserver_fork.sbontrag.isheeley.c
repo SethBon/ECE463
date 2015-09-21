@@ -141,13 +141,13 @@ void sendFile(int connfd) {
 
 
 		if(access(filename, F_OK) != 0) {
-			send(connfd, "HTTP/1.1 404 Not Found\r\n\r\n", 26, 0);
+			send(connfd, "HTTP/1.0 404 Not Found\r\n\r\n", 26, 0);
 			return;
 		}
 
 
 		if(access(filename, R_OK) != 0) {
-			send(connfd, "HTTP/1.1 403 Forbidden\r\n\r\n", 26, 0);
+			send(connfd, "HTTP/1.0 403 Forbidden\r\n\r\n", 26, 0);
 			return;
 		}
 
@@ -157,8 +157,8 @@ void sendFile(int connfd) {
 			printf("file handle is null");
 		}
 		printf("before send\n");
-		send(connfd, "HTTP/1.1 200 OK\r\n\r\n", 19, 0);
-		printf("HTTP/1.1 200 OK\r\n\r\n");
+		send(connfd, "HTTP/1.0 200 OK\r\n\r\n", 19, 0);
+		printf("HTTP/1.0 200 OK\r\n\r\n");
 		while(!feof(fh)) {
 			bzero(buf, 512);
 			fread(buf, 511, 1, fh);
