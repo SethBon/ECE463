@@ -23,6 +23,8 @@ int main(int argc, char const *argv[]) {
 	
 	char * haddrp;
 
+	pid_t childpid;
+
 
 
 	port = atoi(argv[1]);
@@ -34,14 +36,14 @@ int main(int argc, char const *argv[]) {
 	
 		connfd = accept(listenfd, (struct sockaddr*)&clientaddr, &clientlen);
 
-		hp = gethostbyaddr((const char *)&clientaddr.sin_addr.s_addr, sizeof(clientaddr.sin_addr.s_addr), AF_INET);
+		if( (childpid = fork()) == 0 ) {
+			close(listenfd);
+			sendFile(connfd);
+			exit(0);
+
+		}
+
 		
-		haddrp = inet_ntoa(clientaddr.sin_addr);
-
-		printf("Fd %d\n", connfd);
-
-
-		sendFile(connfd);
 
 		close(connfd);
 
@@ -161,7 +163,7 @@ void sendFile(int connfd) {
 			bzero(buf, 512);
 			fread(buf, 511, 1, fh);
 			send(connfd, buf, 511, 0);
-			printf(buf);
+			//printf(buf);
 		
 		}
 
