@@ -114,7 +114,7 @@ void sendFile(int connfd) {
 	running = buf;
 
 
-	printf("%s\n\n", buf);
+	//printf("%s\n\n", buf);
 
 	httpCommand = strsep(&running, delimiter);
 	filename = strsep(&running, delimiter);
@@ -127,17 +127,15 @@ void sendFile(int connfd) {
 		httpCommand[i] = toupper(httpCommand[i++]);
 	}
 
-	printf("\nhttpCommand = %s\n", httpCommand); 
-	printf("\nfilename = %s\n", filename); 
-	printf("\nhttpVersion = %s\n", httpVersion);
+	//printf("\nhttpCommand = %s\n", httpCommand); 
+	//printf("\nfilename = %s\n", filename); 
+	//printf("\nhttpVersion = %s\n", httpVersion);
 
-	int test = strcmp(httpCommand, "GET") == 0;
-	printf("%d\n\n", test);
 
 
 	if(strcmp(httpCommand, "GET") == 0) {
 		
-		printf("its a get!");
+		//printf("its a get!");
 
 
 		if(access(filename, F_OK) != 0) {
@@ -151,14 +149,14 @@ void sendFile(int connfd) {
 			return;
 		}
 
-		printf("before fopen\n");
+		//printf("before fopen\n");
 		fh = fopen(filename, "r");
 		if(fh == NULL){
-			printf("file handle is null");
+			return;
 		}
-		printf("before send\n");
+		//printf("before send\n");
 		send(connfd, "HTTP/1.0 200 OK\r\n\r\n", 19, 0);
-		printf("HTTP/1.0 200 OK\r\n\r\n");
+		//printf("HTTP/1.0 200 OK\r\n\r\n");
 		while(!feof(fh)) {
 			bzero(buf, 512);
 			fread(buf, 511, 1, fh);
@@ -166,6 +164,8 @@ void sendFile(int connfd) {
 			//printf(buf);
 		
 		}
+
+		fclose(fh);
 
 
 
