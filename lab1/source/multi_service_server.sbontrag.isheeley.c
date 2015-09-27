@@ -49,7 +49,7 @@ int main(int argc, char const *argv[]) {
 
 	http_listenfd = open_listenfd(http_port, 0);
 	ping_listenfd = open_listenfd(ping_port, 1);
-	printf("\nping_listenfd = %d\n", ping_listenfd);
+	//printf("\nping_listenfd = %d\n", ping_listenfd);
 
 
 	while(1) {
@@ -62,7 +62,7 @@ int main(int argc, char const *argv[]) {
 		retval = select(maxfd, &rfds, NULL,	NULL, NULL);
 
 		if(FD_ISSET(http_listenfd, &rfds)) {
-			printf("\nHTTP FD IS SET\n");
+			//printf("\nHTTP FD IS SET\n");
 			clientlen = sizeof(clientaddr);
 	
 			connfd = accept(http_listenfd, (struct sockaddr*)&clientaddr, &clientlen);
@@ -77,7 +77,7 @@ int main(int argc, char const *argv[]) {
 
 
 		if(FD_ISSET(ping_listenfd, &rfds)) {
-			printf("\nPING FD IS SET\n");
+			//printf("\nPING FD IS SET\n");
 			handlePing(ping_listenfd);
 
 
@@ -101,36 +101,29 @@ int main(int argc, char const *argv[]) {
 void handlePing(int sockfd) {
 
 	size_t len = 68;
-	char buf[68];
+	char buf[68] = {0};
 	struct sockaddr src_addr;
 	socklen_t addrlen;
 	uint32_t seq;
 
-	printf("\nHandling Ping: %d\n", sizeof(seq));
 
 	recvfrom(sockfd, buf, len, 0, &src_addr, &addrlen);
 
-	printf("%x\n", buf[0]);
-	printf("%x\n", buf[1]);
-	printf("%x\n", buf[2]);
-	printf("%x\n", buf[3]);
-	printf("%x\n", buf[4]);
-	printf("%x\n", buf[5]);
-	printf("%x\n", buf[6]);
-	printf("%x\n", buf[7]);
+	printf("%x\n", buf[4] & 0xff);
+	printf("%x\n", buf[5] & 0xff);
+	printf("%x\n", buf[6] & 0xff);
+	printf("%x\n", buf[7] & 0xff);
+	printf("%x\n", buf[8] & 0xff);
+	printf("%x\n", buf[9] & 0xff);
 
+	seq = *((uint32_t *) buf);
+	seq = ntohl(seq);
+	seq++;
+	*((uint32_t *) buf) = htonl(seq);
+
+	//printf("\nseq: %u\n", seq);
 	
-	seq = (*((uint32_t *) buf));
-
-	//ntohl(seq);
-
-	printf("\nseq: %u\n", seq);
-
-	//(*((uint32_t *) buf))++;
-
-	//printf("\nseq: %u\n", (*((uint32_t *) buf)));
-	
-	//htonl(*((uint32_t *) buf));
+	printf("\nmsg: %s\n", buf+4);
 
 
 	
