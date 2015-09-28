@@ -77,7 +77,7 @@ int main(int argc, char const *argv[]) {
 
 
 		if(FD_ISSET(ping_listenfd, &rfds)) {
-			//printf("\nPING FD IS SET\n");
+			printf("\nPING FD IS SET\n");
 			handlePing(ping_listenfd);
 
 
@@ -106,24 +106,27 @@ void handlePing(int sockfd) {
 	socklen_t addrlen;
 	uint32_t seq;
 
+	//printf("\nHandling Ping: %d\n", sizeof(seq));
 
 	recvfrom(sockfd, buf, len, 0, &src_addr, &addrlen);
 
-	printf("%x\n", buf[4] & 0xff);
-	printf("%x\n", buf[5] & 0xff);
-	printf("%x\n", buf[6] & 0xff);
-	printf("%x\n", buf[7] & 0xff);
-	printf("%x\n", buf[8] & 0xff);
-	printf("%x\n", buf[9] & 0xff);
+	
 
-	seq = *((uint32_t *) buf);
+	
+	seq = (*((uint32_t *) buf));
 	seq = ntohl(seq);
 	seq++;
-	*((uint32_t *) buf) = htonl(seq);
+	(*((uint32_t *) buf)) = htonl(seq);
+
+	//ntohl(seq);
 
 	//printf("\nseq: %u\n", seq);
+
+	//(*((uint32_t *) buf))++;
+
+	//printf("\nseq: %u\n", (*((uint32_t *) buf)));
 	
-	printf("\nmsg: %s\n", buf+4);
+	//htonl(*((uint32_t *) buf));
 
 
 	
@@ -146,7 +149,7 @@ int open_listenfd(int port, int protocol) {
 	struct sockaddr_in serveraddr;
 
 	if(protocol == TCP){
-		printf("\nTCP\n");
+		//printf("\nTCP\n");
 		if((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 			return -1;
 		}
