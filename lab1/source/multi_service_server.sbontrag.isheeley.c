@@ -75,9 +75,9 @@ int main(int argc, char const *argv[]) {
 			}
 		}
 
-
-		if(FD_ISSET(ping_listenfd, &rfds)) {
-			printf("\nPING FD IS SET\n");
+		
+		else if(FD_ISSET(ping_listenfd, &rfds)) {
+			printf("\nWAIT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 			handlePing(ping_listenfd);
 
 
