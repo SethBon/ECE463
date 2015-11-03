@@ -34,9 +34,6 @@ void InitRoutingTbl (struct pkt_INIT_RESPONSE *InitResponse, int myID) {
 
 	NumRoutes = i + 1;
 
-	PrintRoutes_DEBUG(myID);
-
-
 }
 
 
