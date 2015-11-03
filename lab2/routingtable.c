@@ -1,10 +1,9 @@
 #include "ne.h"
-
+#include "router.h"
 
 //Function that checks to see if an entry in the routing table needs updated
 int needsUpdate(struct route_entry * myEntry, struct route_entry * updateEntry, unsigned int costToUpdater, unsigned int updater_id, unsigned int myID);
 
-int getEntryIdxById(int node_id);
 
 
 void PrintRoutes_DEBUG (int myID);
@@ -35,7 +34,7 @@ void InitRoutingTbl (struct pkt_INIT_RESPONSE *InitResponse, int myID) {
 
 	NumRoutes = i + 1;
 
-
+	PrintRoutes_DEBUG(myID);
 
 
 }
@@ -103,19 +102,6 @@ int UpdateRoutes(struct pkt_RT_UPDATE *RecvdUpdatePacket, int costToNbr, int myI
   	//PrintRoutes_DEBUG(myID);
 
   	return tableChanged;
-
-}
-
-int getEntryIdxById(node_id) {
-	int i; 
-	for(i = 0; i < NumRoutes; i++) {
-		if(routingTable[i].dest_id == node_id) {
-			return i;
-		}
-
-	}
-
-	return -1;
 
 }
 
