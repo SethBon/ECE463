@@ -5,10 +5,6 @@
 int needsUpdate(struct route_entry * myEntry, struct route_entry * updateEntry, unsigned int costToUpdater, unsigned int updater_id, unsigned int myID);
 
 
-
-void PrintRoutes_DEBUG (int myID);
-
-
 //This is the routing table
 struct route_entry routingTable[MAX_ROUTERS];
 
@@ -26,7 +22,6 @@ void InitRoutingTbl (struct pkt_INIT_RESPONSE *InitResponse, int myID) {
 		routingTable[i].next_hop = InitResponse->nbrcost[i].nbr;
 		routingTable[i].cost = InitResponse->nbrcost[i].cost;
 	}
-
 
 	routingTable[i].dest_id = myID;
 	routingTable[i].next_hop = myID;
@@ -49,57 +44,44 @@ int UpdateRoutes(struct pkt_RT_UPDATE *RecvdUpdatePacket, int costToNbr, int myI
   	for (i = 0; i < RecvdUpdatePacket->no_routes; i++) {
   		updateEntry = RecvdUpdatePacket->route[i];
 
-  		
   		for(j = 0; j < NumRoutes; j++) {
   			myEntry = &routingTable[j];
 
-  			/*
-  			printf("\n\nUpdate Entry:\n");
-			printf("%d -> %d: %d, %d", RecvdUpdatePacket->sender_id, updateEntry.dest_id, updateEntry.next_hop, updateEntry.cost);
-			printf("\n\nMy Entry:\n");
-			printf("%d -> %d: %d, %d", myID, myEntry->dest_id, myEntry->next_hop, myEntry->cost);
-			*/
-
   			if(myEntry->dest_id == updateEntry.dest_id) {
-
-  				
-				
-		
-
-			
 
 
   				if(needsUpdate(myEntry, &updateEntry, costToNbr, RecvdUpdatePacket->sender_id, myID)) {
   					myEntry->next_hop = RecvdUpdatePacket->sender_id;
-  					myEntry->cost = costToNbr + updateEntry.cost;
-  					tableChanged = 1;
-  					
+  		
+  					if (myEntry->cost == INFINITY && costToNbr + updateEntry.cost >= INFINITY) {
+  						myEntry->cost = INFINITY;
+  						tableChanged = 0;
+  					}
+  					else if (costToNbr + updateEntry.cost >= INFINITY) {
+  						myEntry->cost = INFINITY;
+  						tableChanged = 1;
+  					}
+  					else {
+  						myEntry->cost = costToNbr + updateEntry.cost;
+  						tableChanged = 1;		
+  					}
   				}
-  			
   				break;
-
   			}
 
   		}
-
+  		// Entry not found in routing table, add to table
   		if( j == NumRoutes ) {
-  			//printf("\n\nADDING\n\n");
   			routingTable[NumRoutes].dest_id = updateEntry.dest_id;
-			routingTable[NumRoutes].next_hop = updateEntry.next_hop;
+			routingTable[NumRoutes].next_hop = RecvdUpdatePacket->sender_id;
 			routingTable[NumRoutes].cost = updateEntry.cost + costToNbr;
 			NumRoutes++;
 			tableChanged = 1;
 
   		}
-
-
-
   	}
 
-  	//PrintRoutes_DEBUG(myID);
-
   	return tableChanged;
-
 }
 
 
@@ -109,6 +91,9 @@ int needsUpdate(struct route_entry * myEntry, struct route_entry * updateEntry, 
 	unsigned int newCost = costToUpdater + updateEntry->cost;
 
 	if(myEntry->next_hop == updater_id) {
+		if(myEntry->cost == newCost) {		
+			return 0;
+		}
 		return 1;
 	}
 
@@ -139,24 +124,18 @@ void ConvertTabletoPkt(struct pkt_RT_UPDATE *UpdatePacketToSend, int myID) {
 
 
 void PrintRoutes (FILE* Logfile, int myID) {
-	fprintf(Logfile, "Routing Table:\n");
+	fprintf(Logfile, "\nRouting Table:\n");
 
 	int i;
-	for (i = 0; i < NumRoutes; i++) {
-		fprintf(Logfile, "%d -> %d: %d, %d\n", myID, routingTable[i].dest_id, routingTable[i].next_hop, routingTable[i].cost);
+	int j;
+
+	for (j = 0; j < MAX_ROUTERS; j++) {
+		for (i = 0; i < NumRoutes; i++) {
+			if (routingTable[i].dest_id == j) {
+				fprintf(Logfile, "%d -> %d: %d, %d\n", myID, routingTable[i].dest_id, routingTable[i].next_hop, routingTable[i].cost);
+			}
+		}
 	}
-	fprintf(Logfile, "\n\n");
-}
-
-
-void PrintRoutes_DEBUG (int myID) {
-	printf("Routing Table:\n");
-
-	int i;
-	for (i = 0; i < NumRoutes; i++) {
-		printf("%d -> %d: %d, %d\n", myID, routingTable[i].dest_id, routingTable[i].next_hop, routingTable[i].cost);
-	}
-	printf("\n\n");
 }
 
 
@@ -169,6 +148,6 @@ void UninstallRoutesOnNbrDeath(int DeadNbr) {
 			routingTable[i].cost = INFINITY;
 		}
 	}
-
-
 }
+
+

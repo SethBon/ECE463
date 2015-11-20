@@ -1,0 +1,1 @@
+Everything appears to be working correctly as specified.  We have tested with various router configurations and tested failures and restarts and each router converges to the expected values. Log files only print the routing table when it has changed and add converged to the bottom of the table after the converge timeout.
